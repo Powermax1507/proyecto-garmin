@@ -35,7 +35,7 @@ jobs:
       - name: Compilar archivo PRG
         run: |
           if [ -f garmin-sdk/bin/monkeyc ]; then
-            ./garmin-sdk/bin/monkeyc -c 3 -y developer_key.der -o MiPrimeraApp.prg -m manifest.xml -f source/MiAppView.mc -d fr55
+            ./garmin-sdk/bin/monkeyc -c 3 -y developer_key.der -o MiPrimeraApp.prg -m manifest.xml -f MiAppView.mc -d fr55
           else
             echo "El SDK requiere descarga local. Estructura de código guardada correctamente."
           fi
