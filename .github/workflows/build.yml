@@ -22,9 +22,22 @@ jobs:
       - name: Descargar SDK de Connect IQ
         run: |
           mkdir -p garmin-sdk
-          curl -L -A "Mozilla/5.0" "https://developer.garmin.com/downloads/connect-iq/sdks/connectiq-sdk-lin-6.4.2-2023-12-07-353d26a27.zip" -o sdk.zip || true
-          if [ -s sdk.zip ]; then
-            unzip sdk.zip -d garmin-sdk
+          # Obtener la URL del SDK mas reciente desde la API oficial de Garmin
+          SDK_URL=$(curl -s https://developer.garmin.com/downloads/connect-iq/sdks/sdks-list.json | jq -r '.[0].url // empty')
+          
+          if [ -z "$SDK_URL" ]; then
+            SDK_URL="https://developer.garmin.com/downloads/connect-iq/sdks/connectiq-sdk-lin-6.4.2-2023-12-07-353d26a27.zip"
+          fi
+
+          echo "Descargando desde: $SDK_URL"
+          curl -sL -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" "$SDK_URL" -o sdk.zip
+
+          # Verificar que sea un archivo ZIP valido antes de descomprimir
+          if file sdk.zip | grep -q "Zip archive"; then
+            unzip -q sdk.zip -d garmin-sdk
+            echo "SDK descomprimido correctamente."
+          else
+            echo "Garmin requiere la descarga local a través del SDK Manager."
           fi
 
       - name: Generar clave desarrollador temporal
@@ -37,7 +50,8 @@ jobs:
           if [ -f garmin-sdk/bin/monkeyc ]; then
             ./garmin-sdk/bin/monkeyc -c 3 -y developer_key.der -o MiPrimeraApp.prg -m manifest.xml -f MiAppView.mc -d fr55
           else
-            echo "El SDK requiere descarga local. Estructura de código guardada correctamente."
+            echo "AVISO: No se pudo ejecutar el compilador remoto. Se requiere compilación local."
+            exit 1
           fi
 
       - name: Guardar ejecutable PRG
