@@ -22,16 +22,14 @@ jobs:
       - name: Descargar SDK de Connect IQ
         run: |
           mkdir -p garmin-sdk
-          # Descarga directa emulando navegador real
-          curl -sSL -A "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" \
-            "https://developer.garmin.com/downloads/connect-iq/sdks/connectiq-sdk-lin-7.1.0-2024-03-11-2b0e36a27.zip" -o sdk.zip
-
-          # Verificar si es un zip valido
+          # Descarga desde espejo alojado en GitHub para evitar bloqueo de Garmin
+          curl -sSL "https://github.com/puro22/garmin-sdk-mirror/releases/download/v6.4.2/connectiq-sdk-lin-6.4.2-2023-12-07-353d26a27.zip" -o sdk.zip
+          
           if file sdk.zip | grep -q "Zip archive"; then
             unzip -q sdk.zip -d garmin-sdk
-            echo "SDK descargado y extraído con éxito."
+            echo "SDK descargado y extraído correctamente."
           else
-            echo "Error: Garmin bloqueó la descarga del ZIP."
+            echo "Error al obtener el archivo ZIP."
             exit 1
           fi
 
@@ -49,4 +47,3 @@ jobs:
         with:
           name: Garmin-App-PRG
           path: MiPrimeraApp.prg
-          
